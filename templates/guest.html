@@ -1,0 +1,416 @@
+<html lang="en" >
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+
+  html,body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    color: #fff;
+    font-size: 1em;
+    background: black;
+    /*
+    background: rgba(36,36,36,1);
+    background: -moz-radial-gradient(center, ellipse cover, rgba(36,36,36,1) 0%, rgba(19,19,19,1) 64%, rgba(19,19,19,1) 100%);
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(36,36,36,1)), color-stop(64%, rgba(19,19,19,1)), color-stop(100%, rgba(19,19,19,1)));
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(36,36,36,1) 0%, rgba(19,19,19,1) 64%, rgba(19,19,19,1) 100%);
+    background: -o-radial-gradient(center, ellipse cover, rgba(36,36,36,1) 0%, rgba(19,19,19,1) 64%, rgba(19,19,19,1) 100%);
+    background: -ms-radial-gradient(center, ellipse cover, rgba(36,36,36,1) 0%, rgba(19,19,19,1) 64%, rgba(19,19,19,1) 100%);
+    background: radial-gradient(ellipse at center, rgba(36,36,36,1) 0%, rgba(19,19,19,1) 64%, rgba(19,19,19,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#242424', endColorstr='#131313', GradientType=1 );
+    */
+  }
+
+  .help span { color: #888; }
+  .help, #about {
+    color: #555;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 0;
+    margin: 0;
+    line-height: 1em;
+    font-size: 0.5em;
+  }
+
+  #about {
+    left: 10px;
+    right: auto;
+    color: #222;
+  }
+
+  .content {
+    margin: 1em;
+  }
+
+  .info {
+    /*font-family: sans-serif;*/
+    color: #aaa;
+  }
+
+  .info span {
+    color: #fff;
+  }
+
+  .nowrap {
+    white-space: nowrap;
+  }
+
+  .hashtag {
+    font-family: monospace;
+    /*background: #222;*/
+    color: #fff;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 1em;
+    background: #222;
+  }
+
+  .progress-bar div {
+    /*background: #f80;*/
+    /*background: #26c70d;*/
+    background: rgba(13, 96, 199, 0.48);
+    height: 1em;
+    display: block;
+  }
+
+  ol.poll li {
+    list-style-type: upper-alpha;
+    margin: 1em auto;
+  }
+
+  .poll_a span, .poll_b span, .poll_c span, .poll_d span {
+    color: #05aaff;
+  }
+
+  /*li span.votes {
+    color: #aaa;
+  }*/
+
+  </style>
+
+  <!-- unlike most sites, we WANT the loading of JS to stall the page -->
+
+  <!-- <script src="/static/bower_components/angular/angular.js"></script>
+  <script src="/static/bower_components/angular-aria/angular-aria.js"></script>
+  <script src="/static/bower_components/angular-animate/angular-animate.js"></script>
+  <script src="/static/bower_components/angular-messages/angular-messages.js"></script>
+  <!-- <script src="/static/bower_components/angular-material/angular-material.js"></script> --
+  <script src="/static/bower_components/angular-socket-io/socket.js"></script> -->
+
+  <!-- save bandwidth -->
+  <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js"></script>
+
+
+  <!-- <script src="/static/scripts/socket.io.js"></script> -->
+  <!-- <script src="/static/scripts/socket.io-1.4.5.js"></script> -->
+
+  <script src="/static/main.js"></script>
+
+</head>
+<body ng-app="Presentation" ng-controller="AppCtrl">
+
+  <div id="about">AskThe.host</div>
+
+
+  <div class="content">
+
+    <p ng-show="message && !poll">{{"{{"}}message.message}}</p>
+
+    <div ng-show="poll">
+      <p ng-bind="poll.question"></p>
+
+      <ol class="poll">
+        <li ng-show="poll.a" class="poll_a">
+          <span ng-bind="poll.a"></span> &nbsp; &nbsp; <span ng-show="votes[pollKey].a" ng-bind="votes[pollKey].a" class="votes"></span>
+          <div class="progress-bar">
+            <div ng-show="votes[pollKey].a" ng-style="{'width': percentages.a}"></div>
+          </div>
+        </li>
+        <li ng-show="poll.b" class="poll_b">
+          <span ng-bind="poll.b"></span> &nbsp; &nbsp; <span ng-show="votes[pollKey].b" ng-bind="votes[pollKey].b" class="votes"></span>
+          <div class="progress-bar">
+            <div ng-show="votes[pollKey].b" ng-style="{'width': percentages.b}"></div>
+          </div>
+        </li>
+        <li ng-show="poll.c" class="poll_c">
+          <span ng-bind="poll.c"></span> &nbsp; &nbsp; <span ng-show="votes[pollKey].c" ng-bind="votes[pollKey].c" class="votes"></span>
+          <div class="progress-bar">
+            <div ng-show="votes[pollKey].c" ng-style="{'width': percentages.c}"></div>
+          </div>
+        </li>
+        <li ng-show="poll.d" class="poll_d">
+          <span ng-bind="poll.d"></span> &nbsp; &nbsp; <span ng-show="votes[pollKey].d" ng-bind="votes[pollKey].d" class="votes"></span>
+          <div class="progress-bar">
+            <div ng-show="votes[pollKey].d" ng-style="{'width': percentages.d}"></div>
+          </div>
+        </li>
+      </ol>
+
+    </div>
+
+    <p ng-show="!message && !poll" class="info">
+      Text your message to <span class="nowrap">{{"{{"}}prettyPhone}}</span><br>
+      Include the hashtag <span class="hashtag">#{{.hashtag}}</span>
+    </p>
+
+    <div class="help" ng-show="message">
+      Text your <span>message</span> + <span>#{{.hashtag}}</span> to <span>{{"{{"}}prettyPhone}}</span>
+    </div>
+
+    <div class="help" ng-show="poll">
+      Text <span ng-show="!poll.c && !poll.d">
+        A or B
+      </span>
+      <span ng-show="poll.c && !poll.d">
+        A, B, or C
+      </span>
+      <span ng-show="poll.d">
+        A, B, C, or D
+      </span>
+      and <span class="hashtag">#{{.hashtag}}</span> to <span>{{"{{"}}prettyPhone}}</span>
+    </div>
+
+  </div>
+
+
+
+
+    <!-- Your application bootstrap  -->
+    <script type="text/javascript">
+
+      var hashtag = "{{.hashtag}}";
+      var phone = "{{.phone}}";
+
+      // Support a custom, fixed phone number
+      var customPhone = location.search.match(/phone=(\d+)/);
+      if(customPhone) {
+        phone = customPhone[1];
+      }
+
+      // Debug socket.io
+      // var onevent = socket.onevent;
+      // socket.onevent = function (packet) {
+      //     var args = packet.data || [];
+      //     onevent.call (this, packet);    // original call
+      //     packet.data = ["*"].concat(args);
+      //     onevent.call(this, packet);      // additional call to catch-all
+      // };
+      // socket.on("*", function(event,data) {
+      //     console.log(event);
+      //     console.log(data);
+      // });
+
+      $(document).ready(function(){
+        $(window).resize(debounce(500, resizeTextToFit));
+        $(window).trigger('resize');
+      });
+
+      function resizeTextToFit() {
+        var docHeight = $(window).innerHeight();
+        var divHeight = 0;
+
+        for	(var i = 1; i < 6; i += 0.2) {
+          $('body').css({"font-size": (i) + "em"});
+
+          divHeight = $('div.content').outerHeight(true);
+          if (docHeight - divHeight < 30) {
+            break;
+          }
+        }
+      }
+
+      angular
+        .module('Presentation', ['btford.socket-io'])
+        .factory('socket', ['socketFactory', function (socketFactory) {
+            var socket = socketFactory();
+            socket.forward('error');
+            return socket;
+        }])
+        .controller('AppCtrl', ['$scope', 'socket', function ($scope, socket) {
+
+          $scope.user_votes = {};
+          $scope.message = null;
+          $scope.poll = null;
+          $scope.error = null;
+
+          // Votes is an array so that if they click off the poll, then click
+          // back on we don't loose the votes. Refresh WILL loose the votes.
+          $scope.votes = {};
+
+          // Actual percentages for CSS styling
+          $scope.percentages = {};
+
+          $scope.phone = window.phone;
+          $scope.prettyPhone = formatPhone($scope.phone);
+
+          // socket.on('message', function() {
+          //   console.log('socket.on message', arguments);
+          // });
+
+          socket.on("connect", function() {
+            console.log('connected');
+            $scope.error = null;
+
+            socket.emit('join room', hashtag);
+            console.log("join room", hashtag);
+
+          });
+
+          socket.on('connect_error', function (err) {
+            console.log('connect_error', err);
+          });
+
+          socket.on("disconnect", function() {
+            console.log('disconnected');
+          });
+
+          socket.on("reconnect", function() {
+            console.log('- reconnected');
+          });
+
+          socket.on("error", function(error) {
+            console.log('error', error);
+          });
+
+          socket.forward('message', $scope);
+          $scope.$on('socket:message', function (ev, data) {
+
+              // Disable
+              if( ! data) {
+                console.log('no message', data);
+                $scope.poll = null;
+                $scope.message = null;
+                resizeTextToFit();
+                return;
+              }
+
+              var message = JSON.parse(data);
+              console.log('message', message);
+
+              if(message.type == "poll") {
+
+                $scope.message = null;
+                $scope.poll = message.message;
+
+                $scope.pollKey = $scope.poll.question.replace(/\W+/g, '');
+                // $scope.pollKey = "all";
+                $scope.prepareVotes($scope.pollKey);
+
+              } else if (message.type == "message") {
+
+                $scope.poll = null;
+                $scope.message = message.message;
+
+              } else {
+                console.log("Unknown message type");
+              }
+
+              $scope.$apply();
+              resizeTextToFit();
+
+              // storage.set('message', $scope.message);
+          });
+
+          socket.forward('vote', $scope);
+          $scope.$on('socket:vote', function (ev, data) {
+
+              var message = JSON.parse(data);
+              console.log('vote', message);
+
+              if (! $scope.pollKey) {
+                console.log("No poll sent yet");
+                return;
+              }
+
+              // Prevent double votes, but allow changes
+              if($scope.user_votes[$scope.pollKey][message.From]) {
+                var oldVote = $scope.user_votes[$scope.pollKey][message.From];
+                console.log('removing old vote', oldVote, message);
+                $scope.votes[$scope.pollKey][oldVote]--;
+              }
+              $scope.user_votes[$scope.pollKey][message.From] = message.message;
+
+              // Vote
+              $scope.votes[$scope.pollKey][message.message]++;
+
+              // $scope.message = null;
+              // $scope.votes[$scope.pollKey][message.message]++;
+              // $scope.votes[$scope.pollKey]['total']++;
+
+              // console.log('votes', $scope.votes[$scope.pollKey]);
+              // storage.set('message', $scope.message);
+          });
+
+          // Prefill a placeholder for this poll
+          $scope.prepareVotes = function(key) {
+            if($scope.votes[key] === undefined) {
+              $scope.user_votes[key] = {};
+              $scope.votes[key] = { a: 0, b: 0, c: 0, d: 0, total: 0 };
+            }
+          };
+
+          // Every time the numbers are updated we need to update the CSS
+          $scope.$watch('votes', function(newv, oldv) {
+
+            if ( ! $scope.poll) return;
+
+            // console.log('$watch votes', $scope.pollKey);
+
+            var key = $scope.pollKey;
+
+            $scope.percentages = {
+              a: pecent($scope.votes[key].a, $scope.votes[key].total),
+              b: pecent($scope.votes[key].b, $scope.votes[key].total),
+              c: pecent($scope.votes[key].c, $scope.votes[key].total),
+              d: pecent($scope.votes[key].d, $scope.votes[key].total),
+            }
+
+            // console.log($scope.percentages);
+          }, true);
+
+
+          // $scope.$broadcast('message', function() {
+          //   console.log('$broadcast', arguments);
+          // });
+
+        }]);
+
+
+        function formatPhone(phone) {
+          return phone.substr(0, 3) + '-' + phone.substr(3, 3) + '-' + phone.substr(6,4);
+        }
+
+        function pecent(number, total) {
+          return ((number/total) * 100).toFixed(2) + '%';
+        }
+
+    </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-80065328-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+</html>

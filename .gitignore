@@ -10,3 +10,12 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Mac
+.DS_Store
+
+# App Ignore
+main.js
+config.json
+node_modules
+bower_components

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <!-- <link rel="stylesheet" href="/static/bower_components/angular-material/angular-material.css"> -->
+    <!-- <link rel="stylesheet" href="/static/bower_components/font-awesome/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="/static/iconfont/material-icons.css">
+
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+
+
+
+    <style type="text/css">
+    [scroll] {
+      position:fixed;
+      top:0;
+    }
+    /*body {
+      margin-top:80px;
+    }*/
+
+    /*md-content.md-default-theme {
+      background-color: #eee;
+    }*/
+    /*md-card {
+      background-color: #fff;
+    }
+    md-card h2:first-of-type {
+      margin-top: 0;
+    }*/
+
+
+    md-input-container .md-errors-spacer { min-height: 0px !important; }
+
+    .selected-message ._md-list-item-inner {
+      font-size: 1.3em;
+      background: #eee;
+      padding: 1em 1em;
+    }
+
+    .checked-message ._md-list-item-inner {
+      background: #eff;
+    }
+
+    code {
+      color: rgba(16, 108, 200, 0.8);
+      margin-left: 1px;
+      margin-right: 1px;
+      -webkit-font-smoothing: auto;
+      padding: 0.125em 0.35em;
+      border-radius: 2px;
+      background: rgba(0, 0, 0, 0.065);
+      font-family: Menlo, Monaco, "Andale Mono", "lucida console", "Courier New", monospace;
+      overflow-wrap: break-word;
+  }
+
+    </style>
+
+    <base href="/">
+</head>
+
+
+<body ng-app="MyApp" layout="row" ng-controller="ListCtrl" md-theme="{{"{{"}}theme}}">
+
+    <!-- <md-backdrop ng-show="loading" id="loading-backdrop" class="md-opaque md-default-theme"></md-backdrop>
+    <md-progress-circular ng-show="loading" md-mode="indeterminate"></md-progress-circular> -->
+
+    <md-sidenav ng-cloak layout="column" class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+      <md-toolbar class="md-tall md-hue-2">
+        <span flex></span>
+        <div layout="column" class="md-toolbar-tools-bottom inset">
+          <!-- <md-icon md-font-icon="face" class="material-icons">&#xE87C;</md-icon> -->
+          Options
+        </div>
+      </md-toolbar>
+
+      <md-list>
+        <!-- <md-list-item class="md-1-line" ng-click="null">
+          Banned Numbers
+        </md-list-item>
+        <md-list-item class="md-1-line" ng-click="null">
+          Help
+        </md-list-item> -->
+        <md-list-item class="md-1-line" ng-show="hashtag">
+          <div class="md-list-item-text" layout="column">
+            <p>Text <code>#{{"{{"}}hashtag}}</code> to<br>
+            {{"{{"}}prettyPhone}}</p>
+
+            <p>Now that you have choosen a hashtag, you are ready for people to begin texting you messages.</p>
+          </div>
+        </md-list-item>
+        <md-list-item class="md-1-line" ng-show="hashtag">
+          <div class="md-list-item-text" layout="column">
+            <p>View selected messages here:<br>
+            <a ng-href="/about/{{"{{"}}hashtag}}" target="_blank">askthe.host/about/{{"{{"}}hashtag}}</a></p>
+
+            <p>We recomend you load the link above on the projector for the crowd to see.</p>
+          </div>
+        </md-list-item>
+        <md-list-item>
+            <md-select ng-model="selectedTheme" placeholder="Select a theme" flex>
+            <md-option ng-value="themeName" ng-repeat="themeName in themeList" ng-selected="themeName == theme">Theme {{"{{"}}themeName}}</md-option>
+          </md-select>
+        </md-list-item>
+
+        <md-list-item ng-show="hashtag">
+          <md-button ng-csv="exportMessages" csv-header="['Private User', 'Message']" filename="askthehost.csv" class="md-raised md-primary">Export CSV</md-button>
+        </md-list-item>
+
+        <!-- <md-list-item ng-show="hashtag">
+          <p>Now that you have choosen a hashtag you are ready for people to begin texting you messages.</p>
+        </md-list-item> -->
+
+      </md-list>
+
+    </md-sidenav>
+
+    <div layout="column" class="relative" layout-fill role="main" ng-cloak>
+
+      <!-- <md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdd($event)">
+        Add
+      </md-button> -->
+      <!-- <md-toolbar ng-show="!showSearch"> -->
+      <md-toolbar>
+        <div class="md-toolbar-tools">
+          <md-button ng-click="toggleSidenav('left')" hide-gt-md aria-label="Menu" class="md-icon-button">
+            <md-icon md-font-set="material-icons">menu</md-icon>
+          </md-button>
+          <h3 hide-xs ng-show="hashtag">
+            Text #{{"{{"}}hashtag}} to {{"{{"}}prettyPhone}}
+          </h3>
+          <h3 hide-xs ng-show="!hashtag">
+            AskThe.Host - Start a Presentation
+          </h3>
+          <span flex></span>
+
+          <md-button aria-label="Search" ng-show="hashtag" ng-click="showSearch = !showSearch">
+            <md-icon class="material-icons">&#xE8B6;</md-icon>
+          </md-button>
+          <md-button aria-label="Pause" ng-show="hashtag" ng-click="pause = !pause">
+            <md-icon class="material-icons" ng-show="!pause">pause</md-icon>
+            <md-icon class="material-icons" ng-show="pause">play_arrow</md-icon>
+          </md-button>
+          <md-button ng-show="!pollActive && hashtag" aria-label="Create Poll" ng-click="showPoll($event)">
+            Poll
+          </md-button>
+          <md-button ng-show="pollActive && hashtag" aria-label="Stop Poll" ng-click="stopPoll($event)" class="md-accent">
+            Stop Poll
+          </md-button>
+
+        </div>
+
+
+        <!-- <md-tabs md-stretch-tabs class="md-primary" md-selected="data.selectedIndex">
+          <md-tab id="tab1" aria-controls="tab1-content">
+            Latest
+          </md-tab>
+          <md-tab id="tab2" aria-controls="tab2-content">
+            Favorites
+          </md-tab>
+        </md-tabs> -->
+      </md-toolbar>
+
+
+
+      <md-content ng-show="!hashtag" layout-padding>
+        <form name="hashtagForm" novalidate layout-padding>
+          <md-input-container class="md-block" flex-gt-sm layout-padding>
+            <label>Hashtag for audience (keep it short)</label>
+            <input md-maxlength="15" ng-minlength="2" ng-maxlength="20" required name="hashtag" ng-model="hashtaginput" />
+
+            <!-- <div class="hint" ng-if="showHints">Users will add this to their texts</div> -->
+
+            <div ng-messages="hashtagForm.hashtag.$error">
+              <div ng-message="required">hashtag is required.</div>
+              <div ng-message="md-maxlength">The hashtag has to be less than 20 characters long.</div>
+              <div ng-message="md-minlength">The hashtag has to be at least 2 characters long.</div>
+            </div>
+
+            <p>Examples: <code>#harvestfest</code>, <code>#dcsp101</code>, or <code>#ywamkc2016</code>.</p>
+
+          </md-input-container>
+          <md-button class="md-raised md-primary" ng-click="registerHashtag()">Register Hashtag</md-button>
+        </form>
+      </md-content>
+
+
+    <md-content md-theme="searchbar" layout="column" ng-show="pollActive" style="min-height: 70px;">
+      <md-input-container layout-padding>
+        POLL: {{"{{"}}poll.question}}
+      </md-input-container>
+    </md-content>
+
+    <md-content md-theme="searchbar" layout="column" ng-show="showSearch" style="min-height: 70px;">
+      <md-input-container>
+        <!-- <md-button ng-click="showSearch = !showSearch" aria-label="Back">
+          Back
+        </md-button> -->
+         <md-icon class="material-icons">&#xE8B6;</md-icon>
+         <input ng-model="search.message" placeholder="Search here">
+        <!-- <md-checkbox class="md-secondary" ng-model="search.checked" ng-change="toggleSearchChecked"></md-checkbox> -->
+        <md-checkbox class="md-secondary" ng-click="toggleSearchChecked($event)"></md-checkbox>
+      </md-input-container>
+    </md-content>
+
+
+
+
+    <md-content ng-show="hashtag">
+
+      <md-list>
+
+        <!-- <md-list-item ng-repeat="message in messages | reverse | filter:search | orderBy:'message.message == selectedMessage.message'" class="secondary-button-padding" ng-click="setSelectedMessage(message)" ng-class="{'selected-message': message == selectedMessage}"> -->
+        <md-list-item ng-repeat="message in messages | filter:search track by message.id" class="secondary-button-padding" ng-click="setSelectedMessage(message)" ng-class="{'selected-message': message == selectedMessage, 'checked-message': message.checked == true}">
+
+
+          <md-checkbox class="md-secondary" ng-model="message.checked"></md-checkbox>
+          <p>{{"{{"}}message.message{{"}}"}}</p>
+
+          <md-button class="md-mini md-accent" ng-click="deleteMessage($event, message); $event.stopPropagation();">
+            <md-icon class="material-icons">delete</md-icon>
+            <!-- Delete -->
+          </md-button>
+
+          <!-- <md-icon md-svg-icon="communication:email"  ng-click="doSecondaryAction($event)" aria-label="Send Email" class="md-secondary md-hue-3" ></md-icon>
+          <md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon> -->
+
+          <!-- <md-button class="md-accent" ng-click="deleteMessage($event, message); $event.stopPropagation();">Delete</md-button> -->
+
+        </md-list-item>
+
+        <md-list-item ng-show="messages.length < 4">
+          <p>Load this link for your audience to see: <a ng-href="/about/{{"{{"}}hashtag}}" target="_blank">askthe.host/about/{{"{{"}}hashtag}}</a></p>
+        </md-list-item>
+        <md-list-item ng-show="messages.length < 4">
+          <p>This page is this private admin view. As people text you, their messages will show here.</p>
+        </md-list-item>
+
+      </md-list>
+    </md-content>
+
+    </div>
+
+    <!-- Angular Material requires Angular.js Libraries -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.6.3/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ng-csv/0.3.6/ng-csv.min.js"></script>
+
+    <!-- <script src="/static/bower_components/angular/angular.js"></script>
+    <script src="/static/bower_components/angular-aria/angular-aria.js"></script>
+    <script src="/static/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/static/bower_components/angular-messages/angular-messages.js"></script>
+    <script src="/static/bower_components/angular-material/angular-material.js"></script>
+    <script src="/static/bower_components/angular-socket-io/socket.js"></script>
+
+    <script src="/static/scripts/socket.io.js"></script>
+    <script src="/static/app.js"></script> -->
+    <script src="/static/main.js"></script>
+
+    <script>
+
+    var phone = "{{.phone}}";
+
+    </script>
+
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-80065328-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+</body>
+</html>

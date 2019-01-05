@@ -1,0 +1,25 @@
+{
+  "name": "askthehost",
+  "version": "1.0.0",
+  "description": "This is a modification of the https://github.com/vinceprignano/gochatapp project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/xeoncross/textfeedback#readme",
+  "devDependencies": {
+    "bower": "^1.7.9",
+    "gulp": "^4.0.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-debug": "^4.0.0",
+    "gulp-jshint": "^2.0.1",
+    "gulp-size": "^3.0.0",
+    "gulp-uglify": "^3.0.1",
+    "jshint": "^2.9.2"
+  },
+  "dependencies": {
+    "gulp-rename": "^1.2.2"
+  }
+}
