@@ -1,10 +1,10 @@
 {
-  "name": "justtextme",
-  "homepage": "",
+  "name": "askthe.host",
+  "homepage": "http://askthe.host",
   "description": "",
   "main": "",
-  "license": "MIT",
   "private": true,
+  "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
