@@ -7,6 +7,8 @@ This system will receive text messages and push them via websockets to the clien
 
 No account is needed, because the presenter can use the frontend controls to delete or ban texts while they show up on the big screen.
 
+Live: http://askthe.host
+
 # History
 
 For public speaking I wanted a way to:
